@@ -1,19 +1,40 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 // import reactLogo from "./assets/react.svg";
 // import viteLogo from "/vite.svg";
 import "../output.css";
+import Message from "./components/Message";
 
+function formatTime(date: Date) {
+   let hours = date.getHours();
+   const postfix = hours >= 12 ? "PM" : "AM";
+   hours = hours % 12;
+   return `${hours}:${date.getMinutes()} ${postfix}`;
+}
 function App() {
-   const [count, setCount] = useState(0);
-
+   const now = new Date();
+   const [message, setMessage] = useState<string>("");
+   const [messages, setMessages] = useState<IMessage[]>([
+      { text: "Hello, I am a chat bot", sender: "you", time: formatTime(now) },
+   ]);
+   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setMessage(event.target.value);
+   };
+   const containerRef = useRef<HTMLDivElement | null>(null);
+   useEffect(() => {
+      containerRef.current?.scrollTo({ behavior: "smooth", top: containerRef.current.scrollHeight });
+   }, [messages]);
    return (
       <>
          <div className="w-screen h-screen  flex font-poppins bg-bodyColor flex-col ">
             {/* Top Bar  */}
+
             <div className="bg-white flex justify-between items-center  px-12 py-2">
                <div className="flex items-center gap-x-2">
                   <i className="fas fa-user-circle text-4xl"></i>
-                  <span>AskYourPDF</span>
+                  <div className="flex flex-col ">
+                     <span>AskYourPDF</span>
+                     {/* <span className="text-xs">Typing</span> */}
+                  </div>
                </div>
                <button onClick={() => {}}>
                   <i className="fas fa-ellipsis-v text-xl"></i>
@@ -24,11 +45,20 @@ function App() {
                <p className="text-xs ">Ask me about anything</p>
             </div>
             {/* Messages Section */}
-            <div className="w-screen flex-grow  ">22</div>
-
+            <div ref={containerRef} className="w-screen flex-grow flex flex-col gap-10 overflow-y-auto px-12 py-4 ">
+               {messages.map((e) => (
+                  <Message {...e}></Message>
+               ))}
+            </div>
             {/* Type Message Section */}
             <div className=" px-12 mb-10 w-screen  flex gap-2">
-               <button className="bg-yellow-500  rounded-full px-3    hover:bg-red-600">
+               <button
+                  onClick={() => {
+                     document.querySelector(".dailougeBox")?.classList.remove("hidden");
+                     // document.getElementById("root")?.classList.add("blur-background");
+                  }}
+                  className="bg-yellow-500  rounded-full px-3    hover:bg-red-600"
+               >
                   <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                      <g clip-path="url(#clip0_3626_4098)">
                         <path
@@ -54,11 +84,71 @@ function App() {
                <div className="flex items-center flex-grow relative">
                   <input
                      type="text"
-                     className="border flex-grow outline-gray-300 outline-4 w-full rounded-3xl h-12 px-10 "
+                     value={message}
+                     onKeyDown={(event) => {
+                        const now = new Date();
+
+                        if (event.key == "Enter") {
+                           setMessages([
+                              ...messages,
+                              {
+                                 text: message,
+                                 sender: "me",
+                                 time: formatTime(now),
+                              },
+                           ]);
+                           setMessage("");
+                        }
+                     }}
+                     onChange={handleInputChange}
+                     className="border inputText flex-grow outline-gray-300 outline-4 w-full rounded-3xl h-12 px-10 "
                      placeholder="Ask any question about your document"
                   />
-                  <button className="px-2 py-1  bg-black rounded-full absolute right-2">
+
+                  <button
+                     onClick={() => {
+                        const now = new Date();
+
+                        setMessages([...messages, { text: message, sender: "me", time: formatTime(now) }]);
+                        setMessage("");
+                        console.log(containerRef.current);
+                     }}
+                     className="px-2 py-1   bg-black rounded-full absolute right-2"
+                  >
                      <i className="fas fa-paper-plane  text-white"></i>
+                  </button>
+               </div>
+            </div>
+            {/* Dailouge Box */}
+            <div className="absolute w-screen hidden dailougeBox h-screen flex items-center justify-center">
+               <div className="absolute w-screen  h-screen blur-background bg-black"></div>
+               <div className="flex flex-col gap-6 w-96 items-center bg-white z-20 px-4 py-8 rounded-2xl">
+                  <span className="font-semibold">Clear Conversation History</span>
+                  <span className="text-center text-sm">Are you sure you want to clear your conversation history?</span>
+                  <button
+                     onClick={() => {
+                        document.querySelector(".dailougeBox")?.classList.add("hidden");
+                     }}
+                     className="w-full bg-black text-white font-semibold rounded-2xl py-4"
+                  >
+                     Go Back
+                  </button>
+                  <button
+                     className="text-red-500  font-semibold"
+                     onClick={() => {
+                        const now = new Date();
+
+                        setMessages([
+                           {
+                              text: "Hello, I am here to help you out",
+                              sender: "you",
+                              time: formatTime(now),
+                           },
+                        ]);
+                        document.querySelector(".dailougeBox")?.classList.add("hidden");
+                     }}
+                  >
+                     Clear
                   </button>
                </div>
             </div>
