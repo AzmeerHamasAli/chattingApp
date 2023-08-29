@@ -4,3 +4,8 @@ interface IMessage {
    sender: "me" | "you";
    time: string;
 }
+
+interface IChat {
+   messages: IMessage[];
+   id: string;
+}

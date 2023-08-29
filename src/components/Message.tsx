@@ -1,4 +1,3 @@
-import { useState } from "react";
 import "../../output.css";
 
 async function copyText(text: string) {
