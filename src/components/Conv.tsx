@@ -34,6 +34,7 @@ const Conv: React.FC<ConvProps> = (props) => {
       <div className="flex flex-col gap-4">
         {props.allChats.map((chat, i) => (
           <ConvSlab
+            key={i}
             activeChatId={props.activeChatId}
             chat={chat}
             onClick={() => {

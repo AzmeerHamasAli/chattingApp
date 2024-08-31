@@ -15,6 +15,9 @@ export const Login = () => {
     await axios.post(`${url}/sendOTP`, { to: number }).then((res: any) => {
       if (res.status === 200) {
         setSent(true);
+        alert(res.data.message);
+      } else {
+        alert(res.data.message);
       }
     });
   };
@@ -29,6 +32,8 @@ export const Login = () => {
         Cookies.set("token", res.data.token);
         if (res.status === 200) {
           navigate("/");
+        } else {
+          alert(res.data.message);
         }
       });
   };

@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { io } from "socket.io-client";
 
 export const Home = () => {
   //State / Const
@@ -76,19 +77,29 @@ export const Home = () => {
       setNumber(decoded.number);
     }
   };
-  const transformToIChat = (data: { [key: string]: any[] }): IChat[] => {
-    return Object.keys(data).map((number, index) => {
-      const messages: IMessage[] = data[number].map((msg) => ({
-        text: msg.body,
-        sender: msg.direction === "inbound" ? "you" : "me",
-        time: msg.time,
-        date: msg.date,
-      }));
+
+  const convertDataToChats = (
+    data: any[],
+    userPhoneNumber: string
+  ): IChat[] => {
+    return data.map((chat) => {
+      const messages = chat.messages.map((message: any) => {
+        const date = new Date(message.dateCreated);
+        const formattedDate = date.toISOString().split("T")[0]; // Extract date (YYYY-MM-DD)
+        const formattedTime = date.toISOString().split("T")[1].split(".")[0]; // Extract time (HH:MM:SS)
+
+        return {
+          text: message.body,
+          sender: message.author === userPhoneNumber ? "me" : "you",
+          time: formattedTime,
+          date: formattedDate,
+        };
+      });
 
       return {
-        id: (index + 1).toString(),
-        number,
         messages,
+        number: chat.messages[0].author, // Use the sender's number from the first message
+        id: chat.conversationSid,
       };
     });
   };
@@ -99,47 +110,33 @@ export const Home = () => {
     const domain = import.meta.env.VITE_API_REQUEST_DOMAIN;
     const url = `${protocol}://${domain}`;
     await axios
-      .post(`${url}/fetchMessages`, {
+      .post(`${url}/fetchConversations`, {
         number: myNumber,
       })
       .then((res: any) => {
         if (res.status === 200) {
-          console.log(res.data.data);
-          const chatData: IChat[] = transformToIChat(res.data.data);
-          setAllChats(chatData);
-        } else {
           console.log(res);
+          if (myNumber) {
+            const allChats = convertDataToChats(res.data, myNumber);
+            setAllChats(allChats);
+          }
+        } else {
+          alert(res.message);
         }
       });
-  };
-  const connectSocket = async () => {
-    const domain = import.meta.env.VITE_API_REQUEST_DOMAIN;
-
-    const socket = new WebSocket(`wss://${domain}`);
-
-    socket.onopen = () => {
-      console.log("WebSocket connection established.");
-    };
-
-    socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      console.log("New message received:", message);
-      // Handle the incoming message (e.g., update the chat UI)
-    };
-
-    socket.onclose = () => {
-      console.log("WebSocket connection closed.");
-    };
   };
 
   // Effects
   useEffect(() => {
     let token = Cookies.get("token");
     token ? setToken(token) : navigate("/login");
-    connectSocket();
+    // connectSocket();
   }, []);
   useEffect(() => {
-    if (myNumber && allChats.length == 0) fetchMessages();
+    // if (myNumber && allChats.length == 0) fetchMessages();
+    setInterval(async () => {
+      myNumber && fetchMessages();
+    }, 5000);
   }, [myNumber]);
   useEffect(() => {
     if (token) {

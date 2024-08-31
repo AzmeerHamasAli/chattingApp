@@ -34,9 +34,9 @@ const Chat: React.FC<ChatProps> = (props) => {
     const url = `${protocol}://${domain}`;
     await axios
       .post(`${url}/sendMessage`, {
-        from: props.number,
-        to: props.recieverNumber,
-        message: message,
+        number: props.number,
+        conversationSid: props.id,
+        msg: message,
       })
       .then((res: any) => {
         if (res.status === 200) {
@@ -63,9 +63,6 @@ const Chat: React.FC<ChatProps> = (props) => {
             <span>{props.recieverNumber}</span>
           </div>
         </div>
-        <button onClick={() => {}}>
-          <i className="fas fa-ellipsis-v text-xl"></i>
-        </button>
       </div>
       {/* Announcement Bar */}
       <div className="bg-barColor  flex items-center justify-center py-2  ">
