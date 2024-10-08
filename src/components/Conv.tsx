@@ -31,7 +31,7 @@ const Conv: React.FC<ConvProps> = (props) => {
         </button>
       </div> */}
       {/* COVERSATIONS */}
-      <div className="flex flex-col gap-4">
+      <div className=" w-full flex flex-col gap-4">
         {props.allChats.length == 0 ? (
           <span className="w-full items-center justify-center">
             No conversations
