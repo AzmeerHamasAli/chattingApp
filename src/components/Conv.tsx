@@ -33,9 +33,9 @@ const Conv: React.FC<ConvProps> = (props) => {
       {/* COVERSATIONS */}
       <div className=" w-full flex flex-col gap-4">
         {props.allChats.length == 0 ? (
-          <span className="w-full items-center justify-center">
-            No conversations
-          </span>
+          <div className=" w-full flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-solid"></div>
+          </div>
         ) : (
           props.allChats.map((chat, i) => (
             <ConvSlab
