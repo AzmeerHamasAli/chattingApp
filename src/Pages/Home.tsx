@@ -144,7 +144,7 @@ export const Home = () => {
     // if (myNumber && allChats.length == 0) fetchMessages();
     setInterval(async () => {
       myNumber && fetchMessages();
-    }, 1000);
+    }, 10000);
   }, [myNumber]);
   useEffect(() => {
     if (token) {
@@ -161,7 +161,6 @@ export const Home = () => {
         activeChatId={activeChatId}
         allChats={allChats}
         setActiveChatId={setActiveChatId}
-        loading={loading}
       ></Conv>
       {reciverNumber.length > 0 ? (
         <Chat

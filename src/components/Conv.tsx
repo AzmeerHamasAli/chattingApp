@@ -8,7 +8,6 @@ interface ConvProps {
   allChats: IChat[];
   activeChatId: string;
   setReciverNumber: (e: any) => void;
-  loading: boolean;
 }
 const Conv: React.FC<ConvProps> = (props) => {
   return (
@@ -33,10 +32,10 @@ const Conv: React.FC<ConvProps> = (props) => {
       </div> */}
       {/* COVERSATIONS */}
       <div className="flex flex-col gap-4">
-        {props.loading ? (
-          <span>Loading...</span>
-        ) : props.allChats.length == 0 ? (
-          <span>No conversations</span>
+        {props.allChats.length == 0 ? (
+          <span className="w-full items-center justify-center">
+            No conversations
+          </span>
         ) : (
           props.allChats.map((chat, i) => (
             <ConvSlab
