@@ -31,9 +31,9 @@ const Conv: React.FC<ConvProps> = (props) => {
         </button>
       </div> */}
       {/* COVERSATIONS */}
-      <div className=" w-full flex flex-col gap-4">
+      <div className=" w-full flex-grow flex flex-col gap-4">
         {props.allChats.length == 0 ? (
-          <div className=" w-full flex justify-center items-center h-screen">
+          <div className=" w-full flex justify-center items-center h-full">
             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-solid"></div>
           </div>
         ) : (
