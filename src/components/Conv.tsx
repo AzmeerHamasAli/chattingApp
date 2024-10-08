@@ -8,6 +8,7 @@ interface ConvProps {
   allChats: IChat[];
   activeChatId: string;
   setReciverNumber: (e: any) => void;
+  loading: boolean;
 }
 const Conv: React.FC<ConvProps> = (props) => {
   return (
@@ -32,17 +33,23 @@ const Conv: React.FC<ConvProps> = (props) => {
       </div> */}
       {/* COVERSATIONS */}
       <div className="flex flex-col gap-4">
-        {props.allChats.map((chat, i) => (
-          <ConvSlab
-            key={i}
-            activeChatId={props.activeChatId}
-            chat={chat}
-            onClick={() => {
-              props.setReciverNumber(chat.number);
-              props.setActiveChatId(chat.id);
-            }}
-          ></ConvSlab>
-        ))}
+        {props.loading ? (
+          <span>Loading...</span>
+        ) : props.allChats.length == 0 ? (
+          <span>No conversations</span>
+        ) : (
+          props.allChats.map((chat, i) => (
+            <ConvSlab
+              key={i}
+              activeChatId={props.activeChatId}
+              chat={chat}
+              onClick={() => {
+                props.setReciverNumber(chat.number);
+                props.setActiveChatId(chat.id);
+              }}
+            ></ConvSlab>
+          ))
+        )}
 
         {/* <ConvSlab id="1" messages={[{ text: "Mesaage sada", sender: "me", time: "21as" }]}></ConvSlab> */}
         {/* <button

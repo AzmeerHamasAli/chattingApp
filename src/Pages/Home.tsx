@@ -17,6 +17,7 @@ export const Home = () => {
   const [myNumber, setNumber] = useState("");
   const [reciverNumber, setRecieverNumber] = useState("");
   const [allChats, setAllChats] = useState<IChat[]>([]);
+  const [loading, setLoading] = useState(false);
 
   //Functions
 
@@ -106,24 +107,31 @@ export const Home = () => {
 
   //APIS
   const fetchMessages = async () => {
-    const protocol = import.meta.env.VITE_API_REQUEST_PROTOCOL;
-    const domain = import.meta.env.VITE_API_REQUEST_DOMAIN;
-    const url = `${protocol}://${domain}`;
-    await axios
-      .post(`${url}/fetchConversations`, {
+    try {
+      setLoading(true);
+      const protocol = import.meta.env.VITE_API_REQUEST_PROTOCOL;
+      const domain = import.meta.env.VITE_API_REQUEST_DOMAIN;
+      const url = `${protocol}://${domain}`;
+
+      const res = await axios.post(`${url}/fetchConversations`, {
         number: myNumber,
-      })
-      .then((res: any) => {
-        if (res.status === 200) {
-          console.log(res);
-          if (myNumber) {
-            const allChats = convertDataToChats(res.data, myNumber);
-            setAllChats(allChats);
-          }
-        } else {
-          alert(res.message);
-        }
       });
+
+      if (res.status === 200) {
+        console.log(res);
+        if (myNumber) {
+          const allChats = convertDataToChats(res.data, myNumber);
+          setAllChats(allChats);
+        }
+      } else {
+        console.log(res);
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      alert("An error occurred while fetching messages. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Effects
@@ -136,7 +144,7 @@ export const Home = () => {
     // if (myNumber && allChats.length == 0) fetchMessages();
     setInterval(async () => {
       myNumber && fetchMessages();
-    }, 5000);
+    }, 1000);
   }, [myNumber]);
   useEffect(() => {
     if (token) {
@@ -153,6 +161,7 @@ export const Home = () => {
         activeChatId={activeChatId}
         allChats={allChats}
         setActiveChatId={setActiveChatId}
+        loading={loading}
       ></Conv>
       {reciverNumber.length > 0 ? (
         <Chat
